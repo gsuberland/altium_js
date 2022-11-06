@@ -1,0 +1,50 @@
+<html>
+<head>
+<script type="text/javascript" src="base64_binary.js"></script>
+<script type="text/javascript" src="helper_extensions.js"></script>
+<script type="text/javascript" src="u8stream.js"></script>
+<script type="text/javascript" src="ole.js"></script>
+<script type="text/javascript" src="altium_sch_document.js"></script>
+<script type="text/javascript" src="altium_sch_renderer.js"></script>
+<script type="text/javascript" src="test_schdoc.js"></script>
+</head>
+<body>
+<div><input type="file" id="altium-file"></input></div>
+<div><canvas id="canvas" width="1024" height="768"></canvas></div>
+<div><pre id="results"></pre></div>
+<script type="text/javascript">
+
+renderSchematic(getTestFile());
+
+function readSchematicFile(e)
+{
+	let file = e.target.files[0];
+	if (!file)
+	{
+		return;
+	}
+	let reader = new FileReader();
+	reader.onload = function(e)
+	{
+		let contents = e.target.result;
+		renderSchematic(contents);
+	};
+	reader.readAsArrayBuffer(file);
+}
+
+document.getElementById('altium-file').addEventListener('change', readSchematicFile, false);
+
+function renderSchematic(data)
+{
+	let canvas = document.getElementById("canvas");
+	let ole = new OLE(data);
+	let fhEntry = ole.directory_entries.find((de) => de.name == "FileHeader");
+	let fhData = fhEntry.read_all();
+	let altiumDocument = new AltiumDocument(fhData);
+	window.altiumDocument = altiumDocument;
+	let renderer = new AltiumSchematicRenderer(canvas, altiumDocument);
+	renderer.render();
+}
+</script>
+</body>
+</html>
