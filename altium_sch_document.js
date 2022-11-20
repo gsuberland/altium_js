@@ -681,10 +681,11 @@ class AltiumDocument
 {
 	constructor(stream)
 	{
+		const min_record_size = 4
 		this.stream = stream;
 		this.records = [];
 		let index = -1; // header comes first, so give it an index of -1
-		while (this.stream.u8stream_position < this.stream.length)
+		while (this.stream.u8stream_position + min_record_size < this.stream.length)
 		{
 			this.records.push(new AltiumRecord(this.stream, index));
 			index++;
