@@ -2,6 +2,10 @@
 
 The Altium PcbDoc format is an OLE Compound Document. It contains a directory structure with a variety of ASCII/UTF8 and binary structured data streams.
 
+## Contents
+
+[TOC]
+
 ## Document Format Versions
 
 At the time of writing, Altium uses PcbDoc Version 6.0.
