@@ -455,6 +455,9 @@ class AltiumSchematicRenderer
 			ctx.textBaseline = ["bottom", "bottom", "top", "top"][obj.orientation];
 			ctx.fillStyle = this.#altiumColourToHex(obj.colour);
 			ctx.save();
+			const font = doc.sheet.fonts[obj.font_id];
+			let emphasis = (font.bold ? "bold " : "") + (font.italic ? "italic " : "")
+			ctx.font = `${emphasis} ${(font.size - 1)}px ${font.name}`;
 			ctx.translate(obj.x, canvas.height - obj.y);
 			ctx.rotate(obj.orientation * -Math.PI/2);
 			ctx.fillText(obj.text, 0, 0);
