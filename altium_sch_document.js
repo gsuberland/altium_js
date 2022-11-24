@@ -173,6 +173,7 @@ class AltiumLabel extends AltiumObject
 		this.y = Number.parseInt(this.attributes.location_y, 10);
 		this.orientation = Number.parseInt(this.attributes.orientation ?? "0", 10);
 		this.justification = Number.parseInt(this.attributes.justification ?? "0", 10);
+		this.font_id = this.attributes.fontid;
 	}
 }
 
@@ -546,7 +547,9 @@ class AltiumSheet extends AltiumObject
 		{
 			const fontName = this.attributes["fontname" + f.toString()];
 			const fontSize = Number.parseInt(this.attributes["size" + f.toString()] ?? "12", 10);
-			this.fonts[f] = { name: fontName, size: fontSize };
+			const fontBold = (this.attributes["bold" + f.toString()] ?? "") == "T";
+			const fontItalics = (this.attributes["italics" + f.toString()] ?? "") == "T";
+			this.fonts[f] = { name: fontName, size: fontSize, bold: fontBold, italics: fontItalics};
 			f++;
 		}
 	}
