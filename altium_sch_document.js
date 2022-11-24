@@ -313,9 +313,9 @@ class AltiumLine extends AltiumObject
 		super(record);
 		
 		this.x1 = Number.parseInt(this.attributes.location_x, 10);
-		this.y1 = Number.parseInt(this.attributes.corner_x, 10);
-		this.x2 = Number.parseInt(this.attributes.corner_y, 10);
-		this.y2 = Number.parseInt(this.attributes.location_y, 10);
+		this.x2 = Number.parseInt(this.attributes.corner_x, 10);
+		this.y1 = Number.parseInt(this.attributes.location_y, 10);
+		this.y2 = Number.parseInt(this.attributes.corner_y, 10);
 		this.width = Number.parseInt(this.attributes.linewidth ?? "1", 10);
 		this.colour = Number.parseInt(this.attributes.color ?? "0", 10);
 	}
