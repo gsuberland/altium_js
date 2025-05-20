@@ -109,9 +109,17 @@ class OLE
 		
 		this.header.difat = new Uint32Array(this.stream.read(436, true));
 		this.fat_sectors = [];
+		let number_of_entries = 0
 		for (let i = 0; i < 109; i++)
 		{
 			this.fat_sectors[i] = new FATSector(this, this.header.difat[i]);
+			number_of_entries += this.fat_sectors[i].entries.length
+		}
+		let index = 0;
+		this.fat = new Uint32Array(number_of_entries);
+		for (let i=0; i<this.fat_sectors.length; i++) {
+			this.fat.set(this.fat_sectors[i].entries, index);
+			index += this.fat_sectors[i].entries.length
 		}
 		this.directory_entries = [];
 		this.directory_entries[0] = new DirectoryEntry(this, (this.header.first_directory_sector_location + 1) * this.header.sector_size);
@@ -143,7 +151,7 @@ class FATSector
 		{
 			this.type = "FAT";
 			ole.stream.seek_to((this.sector_location + 1) * ole.header.sector_size);
-			this.entries = new Uint32Array(ole.stream.read(ole.header.sector_size - 4, true));
+			this.entries = new Uint32Array(ole.stream.read(ole.header.sector_size, true));
 			this.next_difat_sector = ole.stream.read_u32_le();
 		}
 	}
@@ -183,7 +191,25 @@ class DirectoryEntry
 	
 	read_all()
 	{
-		this.ole.stream.seek_to((this.starting_sector_location + 1) * this.ole.header.sector_size);
-		return new U8Stream(this.ole.stream.read(Number(this.stream_size)));
+		let sector_size = this.ole.header.sector_size
+		let max_sector_count = (Number(this.stream_size) + (sector_size-1)) / sector_size
+		let data = []
+		let total_size = 0
+		let sector = this.starting_sector_location
+		for (let i=0; i<max_sector_count; i++) {
+			if (sector >= 0xFFFFFFFC)
+				break
+			this.ole.stream.seek_to((sector + 1) * sector_size);
+			data.push(this.ole.stream.read(sector_size))
+			total_size += sector_size
+			sector = this.ole.fat[sector]
+		}
+		var all_data = new Uint8Array(total_size);
+		let index = 0
+		for (let i=0; i<data.length; i++) {
+			all_data.set(data[i], index);
+			index += data[i].length
+		}
+		return new U8Stream(all_data);
 	}
 }
